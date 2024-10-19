@@ -1,10 +1,11 @@
 import { Header } from "../components/Header"
+import { ListCategories } from "../components/ListCategories"
 
 export const Home = () => {
     return(
-        <div>
-            <Header />
-            <div>Home</div>
-        </div>
+        <div className="w-full h-screen">
+        <Header />
+        <ListCategories />
+      </div>
     )
 }
