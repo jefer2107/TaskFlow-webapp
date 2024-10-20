@@ -15,7 +15,7 @@ export const Home = () => {
                 setUser(data)
 
             } catch (error) {
-                console.error(`erro ao listar usuários: ${error}`)
+                console.error(`erro ao buscar usuário: ${error}`)
             }
         }
         loadUser()
