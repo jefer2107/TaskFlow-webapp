@@ -13,7 +13,7 @@ export interface ChoreOutput extends Model {
 }
 
 export interface ChoreInputCreate{
-    userId:number;
+    userId:number | null;
     title:string;
     description:string;
 }
