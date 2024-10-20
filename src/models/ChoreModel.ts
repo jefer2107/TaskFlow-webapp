@@ -20,7 +20,7 @@ export interface ChoreInputCreate{
 
 export interface ChoreInputUpdate{
     userId?:number;
-    categoryId:number;
+    categoryId?:number | null;
     title?:string;
     description?:string;
     isCompleted?:boolean;

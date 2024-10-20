@@ -7,6 +7,7 @@ import userApi from "../services/UserApi"
 export const Home = () => {
     const userId = 1
     const [user, setUser] = useState<UserOutput | null>(null)
+    const [update, setUpdate] = useState<boolean>(true)
 
     useEffect(() => {
         const loadUser = async () => {
@@ -19,12 +20,12 @@ export const Home = () => {
             }
         }
         loadUser()
-    }, [])
+    }, [update])
 
     return(
         <div className="w-full h-screen">
         <Header />
-        <ListCategories user={user} />
+        <ListCategories setUpdate={setUpdate} update={update} user={user} />
       </div>
     )
 }

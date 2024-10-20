@@ -1,14 +1,17 @@
-import { FC, useEffect, useState } from "react"
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
 import { UserOutput } from "../models/UserModel"
 import { Chore } from "./Chore"
 import { CategoryOutput } from "../models/CategoryModel"
 import categoryApi from "../services/CategoryApi"
+import choreApi from "../services/ChoreApi"
 
 export interface ListCategoriesProps{
-    user:UserOutput | null
+    user:UserOutput | null;
+    setUpdate: Dispatch<SetStateAction<boolean>>;
+    update: boolean;
 }
 
-export const ListCategories:FC<ListCategoriesProps> = ({user}) => {
+export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}) => {
     const userId = 1
     const [categories, setCategories] = useState<CategoryOutput[]>([])
 
@@ -24,9 +27,7 @@ export const ListCategories:FC<ListCategoriesProps> = ({user}) => {
         }
         loadCategories()
 
-    }, [])
-
-    const updateChore = async (id:number) => {}
+    }, [update])
 
     const handleDragStart = (e:any, id:number) => {
         e.dataTransfer.setData('text/plain', id)
@@ -36,38 +37,69 @@ export const ListCategories:FC<ListCategoriesProps> = ({user}) => {
         e.preventDefault()
     }
 
-    const handleDrop = async (e:any, id:number) => {
+    const removeChoreInCategory = async (e:any) => {
         e.preventDefault();
     
         const itemId = e.dataTransfer.getData('text')
-        alert(`Card com ID: ${itemId} solto na área com ID: ${id}`);
+ 
+        if(itemId){
+            const choreId = parseInt(itemId)
+            const {data} = await choreApi.update(choreId, { categoryId:null })
+
+            if(!data?.id) console.error("Erro ao atualizar a tarefa")
+            else setUpdate((x) => !x)
+        }
+    }
+
+    const addChoreInCategory = async (e:any, id:number) => {
+        e.preventDefault();
+    
+        const itemId = e.dataTransfer.getData('text')
+        if(itemId){
+            const choreId = parseInt(itemId)
+            const {data} = await choreApi.update(choreId, { categoryId: id })
+
+            if(!data?.id) console.error("Erro ao atualizar a tarefa")
+            else setUpdate((x) => !x)
+        }
     }
 
     return(
-        <div className="flex w-full h-full py-10 px-5 overflow-x-auto snap-x snap-mandatory gap-5">
-            <div className="bg-blue-100 min-w-[50vw] h-screen flex justify-center flex-col px-5 py-10 gap-2">
-                <>
-                <h3>Lista de Tarefas</h3>
-                {(user?.chores || []).map(chore => (
-                    <Chore handleDragStart={handleDragStart} chore={chore} />
-                ))}
-                </>
+        <div className="flex overflow-x-auto h-[calc(100vh-4rem)] p-4">
+            <div className="flex space-x-4">
+                <div 
+                    onDragOver={handleDragOver} 
+                    onDrop={removeChoreInCategory} 
+                    className="flex flex-col w-64 bg-blue-200 p-4 rounded-md h-full gap-2 overflow-y-auto"
+                >
+                    <>
+                    <h3>Lista de Tarefas</h3>
+                    {(user?.chores || []).map(chore => (
+                        <Chore handleDragStart={handleDragStart} chore={chore} />
+                    ))}
+                    </>
+                </div>
+                {
+                    (categories || []).map(category => (
+                        <div 
+                            onDragOver={handleDragOver} 
+                            onDrop={(e) => addChoreInCategory(e, category.id)}  
+                            className="flex flex-col w-64 bg-blue-200 p-4 rounded-md h-full gap-2 overflow-y-auto">
+                            <>
+                            <h3> {category.name} </h3>
+                            {(category?.chores || []).map(chore => (
+                                <Chore handleDragStart={handleDragStart} chore={chore} />
+                            ))}
+                            </>
+                        </div>
+                    ))
+                }
             </div>
-            {
-                (categories || []).map(category => (
-                    <div onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, category.id)}  className="bg-blue-100 min-w-[50vw] h-screen flex justify-center flex-col px-5 py-10 gap-2 snap-center">
-                        <>
-                        <h3> {category.name} </h3>
-                        {(category?.chores || []).map(chore => (
-                            <Chore handleDragStart={handleDragStart} chore={chore} />
-                        ))}
-                        </>
-                    </div>
-                ))
-            }
 
-            <div className="bg-blue-100 min-w-[50vw] h-auto flex justify-center p-5 snap-center">
-                <span>+ Adicionar outra categoria</span>
+            <div className="flex flex-col w-64 bg-transparent justify-start items-center">
+                <div className="bg-blue-200 p-4 rounded-md text-blue-600 cursor-pointer">
+                    <span>+ Adicionar outra categoria</span>
+                </div>
             </div>
         </div>
     )

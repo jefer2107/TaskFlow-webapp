@@ -23,4 +23,9 @@ export interface UserOutput extends Model {
     email: string;
     password: string;
     chores: ChoreOutput[];
-  }
+}
+
+export interface UserInputAuthenticate{
+    email: string;
+    password: string;
+}
