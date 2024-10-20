@@ -1,15 +1,15 @@
 import axios from "axios"
-import { CategoryInputCreate, CategoryInputUpdate } from "../models/CategoryModel"
+import { ChoreInputCreate, ChoreInputUpdate } from "../models/ChoreModel"
 
 const host = "http://localhost:5272"
 
-const findAll = (userId:number) => axios.get(`${host}/categories?userId=${userId}`)
-const findOne = (id:number) => axios.get(`${host}/category/${id}`)
-const create = (model:CategoryInputCreate) => axios.post(`${host}/category`, model)
-const update = (id:number, model:CategoryInputUpdate) => axios.patch(`${host}/category/${id}`, model)
-const remove = (id:number) => axios.delete(`${host}/category/${id}`)
+const findAll = () => axios.get(`${host}/chores`)
+const findOne = (id:number, userId:number) => axios.get(`${host}/chore/${id}/user/${userId}`)
+const create = (model:ChoreInputCreate) => axios.post(`${host}/chore`, model)
+const update = (id:number, model:ChoreInputUpdate) => axios.patch(`${host}/chore/${id}`, model)
+const remove = (id:number) => axios.delete(`${host}/chore/${id}`)
 
-const categoryApi = {
+const choreApi = {
     findAll,
     findOne,
     create,
@@ -17,4 +17,4 @@ const categoryApi = {
     remove
 }
 
-export default categoryApi
+export default choreApi

@@ -3,11 +3,12 @@ import { ChoreOutput } from "../models/ChoreModel"
 
 export interface ChoreProps{
     chore:ChoreOutput
+    handleDragStart: (e:any, id:number) => void
 }
 
-export const Chore:FC<ChoreProps> = ({chore}) => {
+export const Chore:FC<ChoreProps> = ({chore, handleDragStart}) => {
     return(
-        <div className="flex flex-col w-full px-2 bg-white h-40 rounded-lg shadow-md">
+        <div draggable="true" onDragStart={(e) => handleDragStart(e, chore.id)} className="flex flex-col w-full px-2 bg-white h-40 rounded-lg shadow-md">
             <div>
                 <div className="text-end">...</div>
             </div>

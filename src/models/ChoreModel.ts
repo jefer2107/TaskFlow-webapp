@@ -11,3 +11,17 @@ export interface ChoreOutput extends Model {
     description: string;
     isCompleted: boolean;
 }
+
+export interface ChoreInputCreate{
+    userId:number;
+    title:string;
+    description:string;
+}
+
+export interface ChoreInputUpdate{
+    userId?:number;
+    categoryId:number;
+    title?:string;
+    description?:string;
+    isCompleted?:boolean;
+}
