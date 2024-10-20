@@ -1,7 +1,7 @@
 import { ChoreInputCreate } from "../../models/ChoreModel";
 import { AbstractValidatorFactory, Validate } from "../AbstractValidatorFactory";
 
-export class ChoreValidator extends AbstractValidatorFactory<ChoreInputCreate>{
+export class ChoreCreateValidator extends AbstractValidatorFactory<ChoreInputCreate>{
 
     getValidate(): Validate<ChoreInputCreate>[] {
         return [

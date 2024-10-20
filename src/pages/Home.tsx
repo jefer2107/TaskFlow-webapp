@@ -3,6 +3,7 @@ import { Header } from "../components/Header"
 import { ListCategories } from "../components/ListCategories"
 import { UserOutput } from "../models/UserModel"
 import userApi from "../services/UserApi"
+import { ModalChore } from "../components/ModalChore"
 
 export const Home = () => {
     const userId = 1
@@ -23,9 +24,11 @@ export const Home = () => {
     }, [update])
 
     return(
-        <div className="w-full h-screen">
-        <Header />
-        <ListCategories setUpdate={setUpdate} update={update} user={user} />
-      </div>
+        <>
+        <div className="h-screen w-full">
+            <Header />
+            <ListCategories setUpdate={setUpdate} update={update} user={user} />
+        </div>
+        </>
     )
 }

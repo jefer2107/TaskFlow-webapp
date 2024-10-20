@@ -4,10 +4,11 @@ import { Chore } from "./Chore"
 import { CategoryOutput } from "../models/CategoryModel"
 import categoryApi from "../services/CategoryApi"
 import choreApi from "../services/ChoreApi"
-import { ChoreInputCreate } from "../models/ChoreModel"
-import { ChoreValidator } from "../validations/chores/ChoreCreateValidator"
+import { ChoreInputCreate, ChoreInputUpdate, ChoreOutput } from "../models/ChoreModel"
+import { ChoreCreateValidator } from "../validations/chores/ChoreCreateValidator"
 import { toastMessages } from "../utils/toastMessages"
 import { ToastContainer } from "react-toastify"
+import { ModalChore } from "./ModalChore"
 
 export interface ListCategoriesProps{
     user:UserOutput | null;
@@ -19,13 +20,17 @@ export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}
     const userId = 1
     const [categories, setCategories] = useState<CategoryOutput[]>([])
     const [showCardAddNewChore, setShowCardAddNewChore] = useState<boolean>(false)
+    const [isModalOpen, setModalOpen] = useState<boolean>(false)
+    const [showEditText, setShowEditText] = useState<boolean>(false)
+    const [showEditDescription, setShowEditDescription] = useState<boolean>(false)
 
-    const choreModel:ChoreInputCreate = {
+    const choreCreateModel:ChoreInputCreate = {
         userId:null,
         title:"",
         description: ""
     }
-    const [chore, setChore] = useState<ChoreInputCreate>(choreModel)
+    const [choreInputCreate, setChoreInputCreate] = useState<ChoreInputCreate>(choreCreateModel)
+    const [choreId, setChoreId] = useState<number | null>(null)
 
     useEffect(() => {
         const loadCategories = async () => {
@@ -76,8 +81,8 @@ export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}
         }
     }
 
-    const modelChange = ({ target }:any) => {
-        setChore((state:ChoreInputCreate) => {
+    const modelChangeCreate = ({ target }:any) => {
+        setChoreInputCreate((state:ChoreInputCreate) => {
             return {  ...state, [target.name]: target.value }
         })
     }
@@ -85,16 +90,16 @@ export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}
     const addNewChore = async () => {
         setShowCardAddNewChore(false)
         try {
-            const body = {...chore, userId}
+            const body = {...choreInputCreate, userId}
 
-            const validator = new ChoreValidator()
+            const validator = new ChoreCreateValidator()
             const errorMessages = validator.errorMessage(body)
 
             if(!errorMessages){
                 await choreApi.create(body)
                 setShowCardAddNewChore(false)
                 setUpdate((x) => !x)
-                setChore(choreModel)
+                setChoreInputCreate(choreCreateModel)
 
             }else{
                 errorMessages.forEach((message) => {
@@ -103,14 +108,32 @@ export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}
             }
 
         } catch (error) {
-            setChore(choreModel)
+            setChoreInputCreate(choreCreateModel)
             toastMessages("error", "Ocorreu um erro ao criar tarefa. Por favor, tente novamente.")
             console.error(`Erro ao criar tarefa: ${error}`)
         }
     }
 
+    const openModalChore = (id:number) => {
+        setModalOpen(true)
+        setChoreId(id)
+    }
+
     return(
+        <>
+        
         <div className="px-4">
+        <ModalChore 
+            setShowEditText={setShowEditText}
+            setShowEditDescription={setShowEditDescription}
+            showEditText={showEditText}
+            showEditDescription={showEditDescription}
+            isModalOpen={isModalOpen}
+            setModalOpen={setModalOpen}
+            choreId={choreId}
+            userId={userId}
+            setUpdate={setUpdate}
+        />
             <h2 className="font-bold text-center text-lg py-5">Lista de Tarefas - março, 2024</h2>
             <div className="flex overflow-x-auto h-[calc(100vh-4rem)] py-5">
                 <div className="flex space-x-4">
@@ -122,15 +145,15 @@ export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}
                         <>
                         <h3>Lista de Tarefas</h3>
                         {(user?.chores || []).map(chore => (
-                            <Chore handleDragStart={handleDragStart} chore={chore} />
+                            <Chore openModalChore={openModalChore} handleDragStart={handleDragStart} chore={chore} />
                         ))}
                         </>
                         {
                             showCardAddNewChore?
                             <div className="flex flex-col w-full p-2 mt-auto bg-gray-200 h-auto rounded-lg shadow-md gap-2">
                             <div className="flex flex-col gap-2">
-                                <input name="title" onChange={modelChange} className="h-10 p-2 rounded-lg" type="text" autoFocus placeholder="Insira um título" />
-                                <input name="description" onChange={modelChange} className="h-15 p-2 h-20 rounded-lg" type="text" placeholder="Insira uma descrição" />
+                                <input name="title" onChange={modelChangeCreate} className="h-10 p-2 rounded-lg" type="text" autoFocus placeholder="Insira um título" />
+                                <input name="description" onChange={modelChangeCreate} className="h-15 p-2 h-20 rounded-lg" type="text" placeholder="Insira uma descrição" />
                             </div>
                             <button 
                                 type="button" 
@@ -158,7 +181,7 @@ export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}
                                 <>
                                 <h3> {category.name} </h3>
                                 {(category?.chores || []).map(chore => (
-                                    <Chore handleDragStart={handleDragStart} chore={chore} />
+                                    <Chore openModalChore={openModalChore} handleDragStart={handleDragStart} chore={chore} />
                                 ))}
                                 </>
                             </div>
@@ -174,5 +197,6 @@ export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}
             </div>
             <ToastContainer />
         </div>
+        </>
     )
 }

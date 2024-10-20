@@ -1,12 +1,12 @@
 export interface Model{
-    id:number;
-    createdAt:Date;
-    updatedAt:Date;
+    id?:number | null;
+    createdAt?:Date;
+    updatedAt?:Date;
 }
 
 export interface ChoreOutput extends Model {
-    userId: number;
-    categoryId?: number;
+    userId: number | null;
+    categoryId?: number | null;
     title: string;
     description: string;
     isCompleted: boolean;
