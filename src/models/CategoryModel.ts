@@ -13,7 +13,7 @@ export interface CategoryOutput extends Model{
 }
 
 export interface CategoryInputCreate{
-    userId:number;
+    userId:number | null;
     name:string;
 }
 
