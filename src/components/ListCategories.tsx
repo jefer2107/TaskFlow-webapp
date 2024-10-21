@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
+import { Dispatch, FC, SetStateAction, useContext, useEffect, useState } from "react"
 import { UserOutput } from "../models/UserModel"
 import { Chore } from "./Chore"
 import { CategoryInputCreate, CategoryOutput } from "../models/CategoryModel"
@@ -10,6 +10,7 @@ import { toastMessages } from "../utils/toastMessages"
 import { ToastContainer } from "react-toastify"
 import { ModalChore } from "./ModalChore"
 import { CategoryValidator } from "../validations/categories/CategoryValidator"
+import { contextUser } from "./context/ContextUser"
 
 export interface ListCategoriesProps{
     user:UserOutput | null;
@@ -18,7 +19,8 @@ export interface ListCategoriesProps{
 }
 
 export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}) => {
-    const userId = 1
+    const { payload } = useContext<any>(contextUser)
+    const userId = payload.id
     const [categories, setCategories] = useState<CategoryOutput[]>([])
     const [showCardAddNewChore, setShowCardAddNewChore] = useState<boolean>(false)
     const [showCardAddNewCategory, setShowCardAddNewCategory] = useState<boolean>(false)
@@ -156,6 +158,17 @@ export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}
         }
     }
 
+    const removeChore = async (id:number) => {
+        try {
+            await choreApi.remove(id)
+            setUpdate((x) => !x)
+            
+        } catch (error) {
+            toastMessages("error", "Ocorreu um erro ao remover a tarefa. Por favor, tente novamente.")
+            console.error(`Erro ao remover tarefa: ${error}`)
+        }
+    }
+
     const openModalChore = (id:number) => {
         setModalOpen(true)
         setChoreId(id)
@@ -187,12 +200,15 @@ export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}
                         <>
                         <h3>Lista de Tarefas</h3>
                         {(user?.chores || []).map(chore => (
-                            <Chore openModalChore={openModalChore} handleDragStart={handleDragStart} chore={chore} />
+                            <Chore removeChore={removeChore} openModalChore={openModalChore} handleDragStart={handleDragStart} chore={chore} />
                         ))}
                         </>
                         {
                         showCardAddNewChore?
-                        <div onBlur={() => setShowCardAddNewChore(false)} className="flex flex-col w-full p-2 mt-auto bg-gray-200 h-auto rounded-lg shadow-md gap-2">
+                        <div className="flex flex-col w-full p-2 mt-auto bg-gray-200 h-auto rounded-lg shadow-md gap-2">
+                            <button onClick={() => setShowCardAddNewChore(false)} className="text-gray-600 text-right">
+                                &times;
+                            </button>
                             <div className="flex flex-col gap-2">
                                 <input name="title" onChange={modelChangeCreateChore} className="h-10 p-2 rounded-lg" type="text" autoFocus placeholder="Insira um título" />
                                 <input name="description" onChange={modelChangeCreateChore} className="h-15 p-2 h-20 rounded-lg" type="text" placeholder="Insira uma descrição" />
@@ -223,7 +239,7 @@ export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}
                                 <>
                                 <h3> {category.name} </h3>
                                 {(category?.chores || []).map(chore => (
-                                    <Chore openModalChore={openModalChore} handleDragStart={handleDragStart} chore={chore} />
+                                    <Chore removeChore={removeChore} openModalChore={openModalChore} handleDragStart={handleDragStart} chore={chore} />
                                 ))}
                                 </>
                             </div>
@@ -236,7 +252,10 @@ export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}
                         <>
                         {
                             showCardAddNewCategory?
-                            <div onBlur={() =>setShowCardAddNewCategory(false)} className="flex flex-col w-full p-2 mt-auto bg-gray-200 h-auto rounded-lg shadow-md gap-2">
+                            <div className="flex flex-col w-full p-2 mt-auto bg-gray-200 h-auto rounded-lg shadow-md gap-2">
+                                <button onClick={() => setShowCardAddNewCategory(false)} className="text-gray-600 text-right">
+                                    &times;
+                                </button>
                                 <div className="flex flex-col gap-2">
                                     <input name="name" onChange={modelChangeCreateCategory} className="h-10 p-2 rounded-lg" type="text" autoFocus placeholder="Insira um Nome" />
                                 </div>
@@ -250,7 +269,6 @@ export const ListCategories:FC<ListCategoriesProps> = ({user, setUpdate, update}
                             </div>
                             :
                             <div onClick={() => setShowCardAddNewCategory(true)} className="flex flex-col w-full p-2 mt-auto h-auto">
-                                {/* <input className="h-10 p-2" value={"+ Adicionar outra categoria"} disabled  autoFocus placeholder="" /> */}
                                 <span className="w-full">+ Adicionar outra categoria</span>
                             </div>
 

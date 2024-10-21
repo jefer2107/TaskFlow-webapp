@@ -29,3 +29,9 @@ export interface UserInputAuthenticate{
     email: string;
     password: string;
 }
+
+export interface PayloadUser{
+    id: number;
+    name: string;
+    email: string;
+}

@@ -68,7 +68,8 @@ export const ModalChore:FC<ModalChoreProps> = (
 
             const data = {
                 title: chore?.title,
-                description: chore?.description
+                description: chore?.description,
+                isCompleted: chore?.isCompleted
             }
 
             if(id && chore){

@@ -3,13 +3,13 @@ import { UserInputAuthenticate, UserInputCreate, UserInputUpdate } from "../mode
 
 const host = "http://localhost:5272"
 
-const findAll = () => axios.get(`${host}/users`)
-const findOne = (id:number) => axios.get(`${host}/user/${id}`)
-const create = (model:UserInputCreate) => axios.post(`${host}/user`, model)
-const update = (id:number, model:UserInputUpdate) => axios.patch(`${host}/user/${id}`, model)
-const remove = (id:number) => axios.delete(`${host}/user/${id}`)
-const auth = (model:UserInputAuthenticate) => axios.post(`/login`, model)
-.then(({  data }) => localStorage.setItem("token", data?.userToken?.token))
+const findAll = async () => axios.get(`${host}/users`)
+const findOne = async (id:number) => axios.get(`${host}/user/${id}`)
+const create = async (model:UserInputCreate) => axios.post(`${host}/user`, model)
+const update = async (id:number, model:UserInputUpdate) => axios.patch(`${host}/user/${id}`, model)
+const remove = async (id:number) => axios.delete(`${host}/user/${id}`)
+const auth = async (model:UserInputAuthenticate) => await axios.post(`${host}/login`, model)
+
 
 const userApi = {
     findAll,
